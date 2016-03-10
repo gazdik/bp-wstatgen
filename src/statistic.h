@@ -16,8 +16,16 @@
 
 
 const unsigned CHARSET_SIZE = 256;
-const unsigned MIN_PASS_LENGTH = 2;
+const unsigned MIN_PASS_LENGTH = 1;
 const unsigned MAX_PASS_LENGTH = 64;
+
+struct StatEntry
+{
+	uint8_t key;
+	uint64_t frequency;
+};
+
+int compareStatEntry(const void *p1, const void *p2);
 
 /**
  * Base class for statistic
@@ -67,8 +75,12 @@ public:
 	virtual void MakeStatistic(const std::string &input_file);
 	virtual void Output(std::ofstream &ofs);
 private:
+	void adjustProbabilities();
+	unsigned getLetterFrequency(uint8_t letter);
+
 	uint64_t *_markov_abs_buffer;
 	uint64_t *_markov_abs_stats[CHARSET_SIZE];
+	StatEntry *_letter_frequency;
 	const uint8_t _TYPE = 1;
 	const uint32_t _LENGTH = CHARSET_SIZE * CHARSET_SIZE * sizeof(uint16_t);
 };

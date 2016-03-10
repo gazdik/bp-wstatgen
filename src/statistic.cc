@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <cstdlib>
 #include <arpa/inet.h>
 
 #include <iostream>
@@ -16,6 +17,14 @@
 using namespace std;
 
 const unsigned BUFFER_SIZE = 256;
+
+int compareStatEntry(const void *p1, const void *p2)
+{
+	const StatEntry *e1 = static_cast<const StatEntry *>(p1);
+	const StatEntry *e2 = static_cast<const StatEntry *>(p2);
+
+	return (e2->frequency - e1->frequency);
+}
 
 void StatisticGroup::Add(const std::string& name)
 {
@@ -51,16 +60,25 @@ MarkovStatistic::MarkovStatistic()
 
 	auto markov_tmp_ptr = _markov_abs_buffer;
 
-	for (unsigned i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < CHARSET_SIZE; i++)
 	{
 		_markov_abs_stats[i] = markov_tmp_ptr;
 		markov_tmp_ptr += CHARSET_SIZE;
+	}
+
+	_letter_frequency = new StatEntry[CHARSET_SIZE];
+	memset(_letter_frequency, 0, CHARSET_SIZE);
+
+	for (int i = 0; i < CHARSET_SIZE; i++)
+	{
+		_letter_frequency[i].key = static_cast<uint8_t>(i);
 	}
 }
 
 MarkovStatistic::~MarkovStatistic()
 {
-	delete _markov_abs_buffer;
+	delete[] _markov_abs_buffer;
+	delete[] _letter_frequency;
 }
 
 Statistic::~Statistic()
@@ -90,6 +108,7 @@ void MarkovStatistic::MakeStatistic(const std::string& input_file)
 	char *line_buffer = new char[BUFFER_SIZE];
 	uint8_t s0, s1;
 
+	// Make frequency analysis of letters
 	while (input)
 	{
 		input.getline(line_buffer, BUFFER_SIZE);
@@ -97,19 +116,25 @@ void MarkovStatistic::MakeStatistic(const std::string& input_file)
 		unsigned line_length = strlen(line_buffer);
 
 		if (line_length < MIN_PASS_LENGTH || line_length > MAX_PASS_LENGTH)
-			break;
+			continue;
 
 		s1 = line_buffer[0];
+//		_letter_frequency[s1].frequency++;
 		_markov_abs_stats[0][s1]++;
 
-		for (unsigned position = 1; position < (line_length - 1); position++)
+		for (unsigned position = 0; position < (line_length - 1); position++)
 		{
 			s0 = line_buffer[position + 0];
 			s1 = line_buffer[position + 1];
 
+			_letter_frequency[s0].frequency++;
 			_markov_abs_stats[s0][s1]++;
 		}
+
+		_letter_frequency[s1].frequency++;
 	}
+
+	adjustProbabilities();
 }
 
 void MarkovStatistic::Output(std::ofstream& outfile)
@@ -214,13 +239,15 @@ void LayeredMarkovStatistic::Output(std::ofstream& outfile)
 
 			for (unsigned k = 0; k < CHARSET_SIZE; k++)
 			{
-				double rel_probability = _markov_abs_stats[i][j][k] / static_cast<double>(total);
+				double rel_probability = _markov_abs_stats[i][j][k]
+						/ static_cast<double>(total);
 				uint16_t abs_probability = rel_probability * UINT16_MAX;
 
 				// Convert to big endian
 				abs_probability = htons(abs_probability);
 
-				outfile.write(reinterpret_cast<char *>(&abs_probability), sizeof(abs_probability));
+				outfile.write(reinterpret_cast<char *>(&abs_probability),
+						sizeof(abs_probability));
 			}
 		}
 	}
@@ -240,4 +267,37 @@ void ContextMarkov::MakeStatistic(const std::string& input_file)
 
 void ContextMarkov::Output(std::ofstream& ofs)
 {
+}
+
+void MarkovStatistic::adjustProbabilities()
+{
+	// Sort letter frequencies in descending order
+	qsort(_letter_frequency, CHARSET_SIZE, sizeof(StatEntry), compareStatEntry);
+
+	// Increase non zero Markov probabilities by charset size
+	// and increase zero probabilities by letter
+	// frequency (value from 0 to 255)
+	for (int i = 0; i < CHARSET_SIZE; i++)
+	{
+		for (int j = 0; j < CHARSET_SIZE; j++)
+		{
+			if (_markov_abs_stats[i][j] != 0)
+				_markov_abs_stats[i][j] += CHARSET_SIZE;
+			else
+				_markov_abs_stats[i][j] += getLetterFrequency(j);
+		}
+	}
+
+}
+
+unsigned MarkovStatistic::getLetterFrequency(uint8_t letter)
+{
+	for (int i = 0; i < CHARSET_SIZE; i++)
+	{
+		if (_letter_frequency[i].key == letter) {
+			return ((CHARSET_SIZE - 1) - i);
+		}
+	}
+
+	return (0);
 }
