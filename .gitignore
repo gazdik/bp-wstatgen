@@ -1,1 +1,8 @@
 *~
+bin/wstatgen
+*.cmake
+**/CMakeFiles
+**/Makefile
+**/CMakeCache.txt
+
+
