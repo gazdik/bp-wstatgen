@@ -1,5 +1,5 @@
 *~
-bin/wstatgen
+bin/
 *.cmake
 **/CMakeFiles
 **/Makefile
