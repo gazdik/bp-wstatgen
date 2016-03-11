@@ -1,8 +1,24 @@
 /*
- * wstatgen.cc
+ * Copyright (C) 2016 Peter Gazdik
  *
- *  Created on: Feb 22, 2016
- *      Author: gazdik
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
  */
 
 #include <getopt.h>
@@ -13,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "statistic.h"
+#include <statistics.h>
 
 using namespace std;
 
@@ -62,7 +78,7 @@ int main(int argc, char *argv[])
 	int c;
 	int option_index = 0;
 
-	StatisticGroup statistics;
+	StatisticsGroup statistics;
 
 	while (1)
 	{
@@ -126,9 +142,6 @@ int main(int argc, char *argv[])
 			<< "\\Description: " << options.description << "\n" << "\3"; // end of text
 	ofs.close();
 
-	ofs.open(options.output_file.c_str(),
-			ofstream::out | ofstream::app | ofstream::binary);
-
-	statistics.MakeStatistic(options.input_file);
-	statistics.Output(ofs);
+	statistics.CreateStatistics(options.input_file);
+	statistics.Output(options.output_file);
 }

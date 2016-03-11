@@ -134,14 +134,24 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>[Targets]/[exe] wstatgen/Source Files/statistic.cc</name>
+			<name>[Targets]/[exe] wstatgen/Source Files/markovstatistics.cc</name>
 			<type>1</type>
-			<location>/home/gazdik/Documents/FIT/IBP/workspace/wstatgen/src/statistic.cc</location>
+			<location>/home/gazdik/Documents/FIT/IBP/workspace/wstatgen/src/markovstatistics.cc</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] wstatgen/Source Files/layeredmarkovstatistics.cc</name>
+			<type>1</type>
+			<location>/home/gazdik/Documents/FIT/IBP/workspace/wstatgen/src/layeredmarkovstatistics.cc</location>
 		</link>
 		<link>
 			<name>[Targets]/[exe] wstatgen/Source Files/wstatgen.cc</name>
 			<type>1</type>
 			<location>/home/gazdik/Documents/FIT/IBP/workspace/wstatgen/src/wstatgen.cc</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] wstatgen/Source Files/statistics.cc</name>
+			<type>1</type>
+			<location>/home/gazdik/Documents/FIT/IBP/workspace/wstatgen/src/statistics.cc</location>
 		</link>
 		<link>
 			<name>[Targets]/[exe] wstatgen/Header Files</name>
