@@ -37,6 +37,7 @@ public:
 
 	virtual void CreateStatistics(const std::string & dictionary);
 	virtual void Output(const std::string & output_file);
+	virtual void Summary();
 
 private:
 	struct StatEntry

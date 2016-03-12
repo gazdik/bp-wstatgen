@@ -186,3 +186,10 @@ void MarkovStatistics::Output(const std::string& output_file)
 		}
 	}
 }
+
+void MarkovStatistics::Summary()
+{
+	cout << "Statistics for First-order Markov model\n"
+			<< "\tTotal lines: " << _cnt_total_lines << "\n"
+			<< "\tValid lines: " << _cnt_valid_lines << "\n";
+}

@@ -83,3 +83,13 @@ void StatisticsGroup::Output(const std::string& output_file)
 	for (auto i : _statistics)
 		i->Output(output_file);
 }
+
+void Statistics::Summary()
+{
+}
+
+void StatisticsGroup::Summary()
+{
+	for (auto i : _statistics)
+		i->Summary();
+}

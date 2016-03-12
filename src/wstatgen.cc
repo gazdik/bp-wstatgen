@@ -144,4 +144,5 @@ int main(int argc, char *argv[])
 
 	statistics.CreateStatistics(options.input_file);
 	statistics.Output(options.output_file);
+	statistics.Summary();
 }

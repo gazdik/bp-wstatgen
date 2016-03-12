@@ -54,6 +54,11 @@ public:
 	 */
 	virtual void Output(const std::string & output_file) = 0;
 
+	/**
+	 * Print short summary of created statistics (number of lines, ...)
+	 * to standard output. It's not necessery to implement it.
+	 */
+	virtual void Summary();
 protected:
 	Statistics();
 };
@@ -81,6 +86,8 @@ public:
 	 * @param statistic Pointer to existing instance
 	 */
 	void Add(Statistics * statistic);
+
+	virtual void Summary();
 
 private:
 	std::vector<Statistics *> _statistics;
