@@ -37,14 +37,30 @@ public:
 
 	virtual void CreateStatistics(const std::string & dictionary);
 	virtual void Output(const std::string & output_file);
+	virtual void Summary();
 
 private:
+	struct StatEntry
+	{
+		uint8_t key;
+		uint64_t frequency;
+	};
+
 	const uint8_t _TYPE = 2;
 	const uint32_t _LENGTH = CHARSET_SIZE * CHARSET_SIZE * MAX_PASS_LENGTH
 			* sizeof(uint16_t);
 
+	static int compareStatEntry(const void *p1, const void *p2);
+	void adjustProbabilities();
+	unsigned getLetterFrequency(uint8_t letter);
+
 	uint64_t *_markov_stats_buffer;
 	uint64_t *_markov_stats[MAX_PASS_LENGTH][CHARSET_SIZE];
+	StatEntry *_letter_frequencies;
+	char *_line_buffer;
+
+	uint64_t _cnt_valid_lines = 0;
+	uint64_t _cnt_total_lines = 0;
 };
 
 #endif /* SRC_LAYEREDMARKOVSTATISTICS_H_ */
