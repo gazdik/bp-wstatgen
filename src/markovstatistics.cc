@@ -72,9 +72,6 @@ MarkovStatistics::MarkovStatistics()
 
 MarkovStatistics::~MarkovStatistics()
 {
-	cout << "Total lines: " << _cnt_total_lines << endl;
-	cout << "Valid lines: " << _cnt_valid_lines << endl;
-
 	delete[] _markov_stats_buffer;
 	delete[] _letter_frequencies;
 	delete[] _line_buffer;
@@ -102,7 +99,7 @@ void MarkovStatistics::CreateStatistics(const std::string & dictionary)
 		s1 = _line_buffer[0];
 		_markov_stats[0][s1]++;
 
-		for (unsigned position = 0; position < (line_length - 1); position++)
+		for (int position = 0; position < (line_length - 1); position++)
 		{
 			s0 = _line_buffer[position + 0];
 			s1 = _line_buffer[position + 1];
@@ -137,7 +134,6 @@ void MarkovStatistics::adjustProbabilities()
 				_markov_stats[i][j] += getLetterFrequency(j);
 		}
 	}
-
 }
 
 unsigned MarkovStatistics::getLetterFrequency(uint8_t letter)
@@ -165,15 +161,15 @@ void MarkovStatistics::Output(const std::string& output_file)
 	uint32_t length = htonl(_LENGTH);
 	output.write(reinterpret_cast<char *>(&length), sizeof(uint32_t));
 
-	for (unsigned i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < CHARSET_SIZE; i++)
 	{
 		uint64_t total = 0;
-		for (unsigned j = 0; j < CHARSET_SIZE; j++)
+		for (int j = 0; j < CHARSET_SIZE; j++)
 		{
 			total += _markov_stats[i][j];
 		}
 
-		for (unsigned j = 0; j < CHARSET_SIZE; j++)
+		for (int j = 0; j < CHARSET_SIZE; j++)
 		{
 			double rel_probability = _markov_stats[i][j] / static_cast<double>(total);
 			uint16_t abs_probability = rel_probability * UINT16_MAX;
@@ -189,7 +185,7 @@ void MarkovStatistics::Output(const std::string& output_file)
 
 void MarkovStatistics::Summary()
 {
-	cout << "Statistics for First-order Markov model\n"
+	cout << "Statistics for first-order Markov model\n"
 			<< "\tTotal lines: " << _cnt_total_lines << "\n"
 			<< "\tValid lines: " << _cnt_valid_lines << "\n";
 }
