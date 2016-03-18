@@ -100,7 +100,7 @@ void LayeredMarkovStatistics::CreateStatistics(const std::string& dictionary)
 			s1 = _line_buffer[position + 1];
 
 			_letter_frequencies[s0].frequency++;
-			_markov_stats[position][s0][s1]++;
+			_markov_stats[position + 1][s0][s1]++;
 		}
 
 		_letter_frequencies[s1].frequency++;
