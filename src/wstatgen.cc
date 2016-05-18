@@ -52,7 +52,6 @@ struct Options
 	bool list_encodings = false;
 	string input_file;
 	string output_file;
-	// TODO add multi-encoding support
 	string encoding;
 	string description;
 //	StatisticGroup statistics;
@@ -136,7 +135,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	// Open output file in text mode and write header
+	// Open output file in text mode and write the header to the beginning
 	ofstream ofs { options.output_file, ofstream::out };
 	ofs << "%WSTAT-1.0%" << "\n" << "\\Encoding: " << options.encoding << "\n"
 			<< "\\Description: " << options.description << "\n" << "\3"; // end of text

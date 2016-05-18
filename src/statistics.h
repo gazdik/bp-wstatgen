@@ -30,7 +30,14 @@
 #include <vector>
 #include <fstream>
 
-const unsigned CHARSET_SIZE = 256;
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>     // ntohl, ntohs
+#endif
+
+const unsigned ASCII_CHARSET_SIZE = 256;
 const unsigned MIN_PASS_LENGTH = 1;
 const unsigned MAX_PASS_LENGTH = 64;
 
@@ -56,7 +63,7 @@ public:
 
 	/**
 	 * Print short summary of created statistics (number of lines, ...)
-	 * to standard output. It's not necessery to implement it.
+	 * to standard output. It's not necessary to implement it.
 	 */
 	virtual void Summary();
 protected:

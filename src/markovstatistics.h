@@ -47,7 +47,7 @@ private:
 	};
 
 	const uint8_t _TYPE = 1;
-	const uint32_t _LENGTH = CHARSET_SIZE * CHARSET_SIZE * sizeof(uint16_t);
+	const uint32_t _LENGTH = ASCII_CHARSET_SIZE * ASCII_CHARSET_SIZE * sizeof(uint16_t);
 
 	/**
 	 * Compare two stat entries
@@ -58,7 +58,7 @@ private:
 	static int compareStatEntry(const void *p1, const void *p2);
 
 	/**
-	 * Sort zero Markov probabilities based on letter frequencies in dictionary
+	 * Adjust zero Markov probabilities based on letter frequencies in dictionary
 	 */
 	void adjustProbabilities();
 
@@ -70,7 +70,7 @@ private:
 	unsigned getLetterFrequency(uint8_t letter);
 
 	uint64_t *_markov_stats_buffer;
-	uint64_t *_markov_stats[CHARSET_SIZE];
+	uint64_t *_markov_stats[ASCII_CHARSET_SIZE];
 	StatEntry *_letter_frequencies;
 	char *_line_buffer;
 	uint64_t _cnt_valid_lines = 0;

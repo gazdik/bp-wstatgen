@@ -23,7 +23,13 @@
 
 #include <markovstatistics.h>
 
-#include <arpa/inet.h> 	// htonl
+#ifdef _WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <arpa/inet.h>     // ntohl, ntohs
+#endif
+
 #include <cstring>			// memset, strlen
 
 #include <iostream>
@@ -46,23 +52,23 @@ int MarkovStatistics::compareStatEntry(const void *p1, const void *p2)
 
 MarkovStatistics::MarkovStatistics()
 {
-	const int buffer_size = CHARSET_SIZE * CHARSET_SIZE;
+	const int buffer_size = ASCII_CHARSET_SIZE * ASCII_CHARSET_SIZE;
 
 	_markov_stats_buffer = new uint64_t[buffer_size];
 	memset(_markov_stats_buffer, 0, buffer_size);
 
 	auto markov_tmp_ptr = _markov_stats_buffer;
 
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		_markov_stats[i] = markov_tmp_ptr;
-		markov_tmp_ptr += CHARSET_SIZE;
+		markov_tmp_ptr += ASCII_CHARSET_SIZE;
 	}
 
-	_letter_frequencies = new StatEntry[CHARSET_SIZE];
-	memset(_letter_frequencies, 0, CHARSET_SIZE);
+	_letter_frequencies = new StatEntry[ASCII_CHARSET_SIZE];
+	memset(_letter_frequencies, 0, ASCII_CHARSET_SIZE);
 
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		_letter_frequencies[i].key = static_cast<uint8_t>(i);
 	}
@@ -119,17 +125,17 @@ void MarkovStatistics::CreateStatistics(const std::string & dictionary)
 void MarkovStatistics::adjustProbabilities()
 {
 	// Sort letter frequencies in descending order
-	qsort(_letter_frequencies, CHARSET_SIZE, sizeof(StatEntry), compareStatEntry);
+	qsort(_letter_frequencies, ASCII_CHARSET_SIZE, sizeof(StatEntry), compareStatEntry);
 
 	// Increase non zero Markov probabilities by charset size
 	// and increase zero probabilities by letter
 	// frequency (value from 0 to 255)
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
-		for (int j = 0; j < CHARSET_SIZE; j++)
+		for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 		{
 			if (_markov_stats[i][j] != 0)
-				_markov_stats[i][j] += CHARSET_SIZE;
+				_markov_stats[i][j] += ASCII_CHARSET_SIZE;
 			else
 				_markov_stats[i][j] += getLetterFrequency(j);
 		}
@@ -138,11 +144,11 @@ void MarkovStatistics::adjustProbabilities()
 
 unsigned MarkovStatistics::getLetterFrequency(uint8_t letter)
 {
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		if (_letter_frequencies[i].key == letter)
 		{
-			return ((CHARSET_SIZE - 1) - i);
+			return ((ASCII_CHARSET_SIZE - 1) - i);
 		}
 	}
 
@@ -161,15 +167,15 @@ void MarkovStatistics::Output(const std::string& output_file)
 	uint32_t length = htonl(_LENGTH);
 	output.write(reinterpret_cast<char *>(&length), sizeof(uint32_t));
 
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		uint64_t total = 0;
-		for (int j = 0; j < CHARSET_SIZE; j++)
+		for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 		{
 			total += _markov_stats[i][j];
 		}
 
-		for (int j = 0; j < CHARSET_SIZE; j++)
+		for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 		{
 			double rel_probability = _markov_stats[i][j] / static_cast<double>(total);
 			uint16_t abs_probability = rel_probability * UINT16_MAX;

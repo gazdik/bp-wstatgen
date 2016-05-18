@@ -47,7 +47,7 @@ private:
 	};
 
 	const uint8_t _TYPE = 2;
-	const uint32_t _LENGTH = CHARSET_SIZE * CHARSET_SIZE * MAX_PASS_LENGTH
+	const uint32_t _LENGTH = ASCII_CHARSET_SIZE * ASCII_CHARSET_SIZE * MAX_PASS_LENGTH
 			* sizeof(uint16_t);
 
 	static int compareStatEntry(const void *p1, const void *p2);
@@ -55,7 +55,7 @@ private:
 	unsigned getLetterFrequency(uint8_t letter);
 
 	uint64_t *_markov_stats_buffer;
-	uint64_t *_markov_stats[MAX_PASS_LENGTH][CHARSET_SIZE];
+	uint64_t *_markov_stats[MAX_PASS_LENGTH][ASCII_CHARSET_SIZE];
 	StatEntry *_letter_frequencies;
 	char *_line_buffer;
 

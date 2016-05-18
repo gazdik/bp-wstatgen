@@ -23,7 +23,12 @@
 
 #include <statistics.h>
 
-#include <arpa/inet.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <arpa/inet.h>     // ntohl, ntohs
+#endif
 
 #include <iostream>
 

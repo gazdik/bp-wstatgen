@@ -23,7 +23,13 @@
 
 #include <layeredmarkovstatistics.h>
 
-#include <arpa/inet.h>		// htonl
+#ifdef _WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <arpa/inet.h>     // ntohl, ntohs
+#endif
+
 #include <cstring>				// memset, strlen
 
 #include <iostream>
@@ -38,7 +44,7 @@ const unsigned BUFFER_SIZE = 65536;
 
 LayeredMarkovStatistics::LayeredMarkovStatistics()
 {
-	const int buffer_size = MAX_PASS_LENGTH * CHARSET_SIZE * CHARSET_SIZE;
+	const int buffer_size = MAX_PASS_LENGTH * ASCII_CHARSET_SIZE * ASCII_CHARSET_SIZE;
 
 	_markov_stats_buffer = new uint64_t[buffer_size];
 	memset(_markov_stats_buffer, 0, buffer_size);
@@ -47,17 +53,17 @@ LayeredMarkovStatistics::LayeredMarkovStatistics()
 
 	for (int p = 0; p < MAX_PASS_LENGTH; p++)
 	{
-		for (int i = 0; i < CHARSET_SIZE; i++)
+		for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 		{
 			_markov_stats[p][i] = markov_tmp_ptr;
-			markov_tmp_ptr += CHARSET_SIZE;
+			markov_tmp_ptr += ASCII_CHARSET_SIZE;
 		}
 	}
 
-	_letter_frequencies = new StatEntry[CHARSET_SIZE];
-	memset(_letter_frequencies, 0, CHARSET_SIZE);
+	_letter_frequencies = new StatEntry[ASCII_CHARSET_SIZE];
+	memset(_letter_frequencies, 0, ASCII_CHARSET_SIZE);
 
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		_letter_frequencies[i].key = static_cast<uint8_t>(i);
 	}
@@ -124,15 +130,15 @@ void LayeredMarkovStatistics::Output(const std::string& output_file)
 	// Calc relative frequency and map it into 16 bit value
 	for (int p = 0; p < MAX_PASS_LENGTH; p++)
 	{
-		for (int i = 0; i < CHARSET_SIZE; i++)
+		for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 		{
 			uint64_t total = 0;
-			for (int j = 0; j < CHARSET_SIZE; j++)
+			for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 			{
 				total += _markov_stats[p][i][j];
 			}
 
-			for (int j = 0; j < CHARSET_SIZE; j++)
+			for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 			{
 				double rel_probability = _markov_stats[p][i][j]
 						/ static_cast<double>(total);
@@ -158,19 +164,19 @@ int LayeredMarkovStatistics::compareStatEntry(const void* p1, const void* p2)
 void LayeredMarkovStatistics::adjustProbabilities()
 {
 	// Sort letter frequencies in descending order
-	qsort(_letter_frequencies, CHARSET_SIZE, sizeof(StatEntry), compareStatEntry);
+	qsort(_letter_frequencies, ASCII_CHARSET_SIZE, sizeof(StatEntry), compareStatEntry);
 
 	// Increase non zero Markov probabilities by charset size
 	// and increase zero probabilities by letter
 	// frequency (value from 0 to 255)
 	for (int p = 0; p < MAX_PASS_LENGTH; p++)
 	{
-		for (int i = 0; i < CHARSET_SIZE; i++)
+		for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 		{
-			for (int j = 0; j < CHARSET_SIZE; j++)
+			for (int j = 0; j < ASCII_CHARSET_SIZE; j++)
 			{
 				if (_markov_stats[p][i][j] != 0)
-					_markov_stats[p][i][j] += CHARSET_SIZE;
+					_markov_stats[p][i][j] += ASCII_CHARSET_SIZE;
 				else
 					_markov_stats[p][i][j] += getLetterFrequency(j);
 			}
@@ -187,11 +193,11 @@ void LayeredMarkovStatistics::Summary()
 
 unsigned LayeredMarkovStatistics::getLetterFrequency(uint8_t letter)
 {
-	for (int i = 0; i < CHARSET_SIZE; i++)
+	for (int i = 0; i < ASCII_CHARSET_SIZE; i++)
 	{
 		if (_letter_frequencies[i].key == letter)
 		{
-			return ((CHARSET_SIZE - 1) - i);
+			return ((ASCII_CHARSET_SIZE - 1) - i);
 		}
 	}
 
