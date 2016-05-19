@@ -39,7 +39,7 @@
 
 const unsigned ASCII_CHARSET_SIZE = 256;
 const unsigned MIN_PASS_LENGTH = 1;
-const unsigned MAX_PASS_LENGTH = 64;
+const unsigned MAX_PASS_LENGTH = 50;
 
 /**
  * Base class for statistics
