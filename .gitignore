@@ -1,5 +1,8 @@
 *~
 bin/
+.project
+.cproject
+.settings
 *.cmake
 **/CMakeFiles
 **/Makefile
